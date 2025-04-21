@@ -29,6 +29,20 @@
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
+
+## Database Schema
+
+![db](./docs/db_schema.png)
+
+## Layout Design
+
+![signin](./docs/signin.png)
+![signup](./docs/signup.png)
+![home](./docs/home.png)
+
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
 <!-- GETTING STARTED -->
 
 ## 📁 Getting Started
@@ -37,31 +51,25 @@
 
 1. Clone the repo
    ```sh
-   git clone https://github.com/sidoelz123/simple-journey-challenge.git
+   https://github.com/sidoelz123/wails-Todolist.git
    ```
 2. Navigate to the Project Directory
 
     ```sh
-    cd simple-journey-challenge
+    cd wails-Todolist
     ```
 
 3. Install Depedencies
    ```sh
-   bun Install
+   go mod tidy
    ```
 
 4. Start the project
    ```sh
-   bun dev
+   wails dev
    ```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-
-
-
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p> -->
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
