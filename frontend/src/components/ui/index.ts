@@ -6,8 +6,14 @@ import MorphingTabs from "./MorphingTabs/MorphingTabs.vue";
 import DarkModeToggle from "./DarkModeToggle/DarkModeToggle.vue";
 import GlowingEffect from "./GlowingEffect/GlowingEffect.vue";
 import TodoModals from "./TodoModals/TodoModals.vue";
+import AnimatedTooltip from "./AnimatedTooltip/AnimatedTooltip.vue"
+import SplashScreen from "./SplachScreen/SplashScreen.vue";
+import ContainerTextFlip from "./ContainerTextFlip/ContainerTextFlip.vue";
 
 export {
+  ContainerTextFlip,
+  SplashScreen,
+  AnimatedTooltip,
   TodoModals,
   GlowingEffect,
   DarkModeToggle,
