@@ -38,9 +38,11 @@
 
       <button
         type="submit"
-        class="w-full p-3 rounded bg-foreground text-primary-foreground hover:bg-primary/90 transition"
+        :disabled="loading"
+        class="w-full p-3 rounded bg-foreground text-primary-foreground hover:bg-primary/90 transition disabled:opacity-50"
       >
-        Register
+        <span v-if="loading">Registering...</span>
+        <span v-else>Register</span>
       </button>
 
       <p class="text-sm text-primary text-center">
@@ -65,8 +67,13 @@ const firstname = ref('')
 const lastname = ref('')
 const email = ref('')
 const password = ref('')
+const loading = ref(false)
 
 const handleRegister = async () => {
+  loading.value = true
+
+  const toastId = toast.loading('Mendaftarkan akun...')
+
   try {
     const { error } = await authStore.register({
       firstname: firstname.value,
@@ -76,14 +83,33 @@ const handleRegister = async () => {
     })
 
     if (error) {
-      toast.error(error.message)
+      toast.update(toastId, {
+        render: error.message,
+        type: "error",
+        isLoading: false,
+        autoClose: 3000,
+      })
+      loading.value = false
       return
     }
 
-    toast.success('Registrasi berhasil! Silakan cek email untuk verifikasi.')
+    toast.update(toastId, {
+      render: "Registrasi berhasil! Silakan cek email untuk verifikasi.",
+      type: "success",
+      isLoading: false,
+      autoClose: 3000,
+    })
+
     router.push("/signin")
   } catch (err: any) {
-    toast.error(err.message || 'Registrasi gagal.')
+    toast.update(toastId, {
+      render: err.message || 'Registrasi gagal.',
+      type: "error",
+      isLoading: false,
+      autoClose: 3000,
+    })
+  } finally {
+    loading.value = false
   }
 }
 </script>

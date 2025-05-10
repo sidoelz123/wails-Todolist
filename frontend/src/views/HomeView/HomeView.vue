@@ -1,5 +1,5 @@
 <template>
-  <SplashScreen :show="showSplash" class="transition-all duration-300"/>
+  <SplashScreen :show="showSplash" :username="username" class="transition-all duration-300" />
   <div v-if="!showSplash" :class="[
     'flex w-full min-h-screen flex-col items-center px-4 py-8 gap-8 container max-w-screen-sm transition-all duration-300',
     showModal ? 'blur-sm pointer-events-none select-none scale-[0.98]' : ''
@@ -15,9 +15,10 @@
       <MorphingTabs :tabs="tabs" :active-tab="activeTab" @update:active-tab="activeTab = $event" />
       <div class=" border-2 flex gap-3">
         <InteractiveHoverButton text="Add" class="w-fit" @click="showModal = true" />
-        <button>
-          <AnimatedTooltip :items="item"  />
+        <button @click="handleLogout">
+          <AnimatedTooltip :items="item" />
         </button>
+        <p>{{username}}</p>
       </div>
     </div>
     <section
@@ -32,8 +33,8 @@
 </template>
 
 <script setup lang="ts">
-import {SplashScreen, AnimatedTooltip, TodoModals, GlowingEffect, DarkModeToggle, InteractiveHoverButton, MorphingTabs, TextGenerateEffect, VanishingInput } from "@/components/ui";
-import { ref,onMounted } from "vue";
+import { SplashScreen, AnimatedTooltip, TodoModals, GlowingEffect, DarkModeToggle, InteractiveHoverButton, MorphingTabs, TextGenerateEffect, VanishingInput } from "@/components/ui";
+import { ref, onMounted } from "vue";
 const placeholders = [
   "What should I do today?",
   "Don't forget to finish that thing...",
@@ -56,16 +57,34 @@ const item = [
 ]
 const text = ref("");
 const showModal = ref(false)
+const username = ref('')
 const tabs = ["All", "Todo", "In Progress", "Done"];
 const activeTab = ref(tabs[0]);
+import { useAuthStore } from "@/stores/authStore"; 
+import { useRouter } from "vue-router";
+const authStore = useAuthStore();
+const router = useRouter();
 const handleAddTodo = (todo: { title: string; description: string }) => {
   console.log("New todo added:", todo)
 }
+const handleLogout = async () => {
+  await authStore.logout();
+  router.push("/signin"); 
+};
 
 const showSplash = ref(true);
-onMounted(() => {
+
+onMounted(async () => {
+  const { user } = await authStore.getUser();
+  if (user && user.firstname) {
+    username.value = `${authStore.user.firstname} 👋`; 
+    console.log(username.value);
+    
+  }
   setTimeout(() => {
     showSplash.value = false;
   }, 2500);
 });
+
+
 </script>

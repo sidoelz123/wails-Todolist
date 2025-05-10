@@ -1,23 +1,36 @@
 // stores/authStore.ts
 
-import { defineStore } from 'pinia'
-import { ref } from 'vue'
-import { supabase } from '@/config/supabase'
+import { defineStore } from "pinia";
+import { ref } from "vue";
+import { supabase } from "@/config/supabase";
 
-export const useAuthStore = defineStore('auth', () => {
-  const user = ref<any>(null)
-  const login = async ({ email, password }: { email: string; password: string }) => {
+export const useAuthStore = defineStore("auth", () => {
+  const user = ref<any>(null);
+  const accessToken = ref<string | null>(null);
+  const storedToken = sessionStorage.getItem("access_token");
+  if (storedToken) {
+    accessToken.value = storedToken;
+  }
+  const login = async ({
+    email,
+    password,
+  }: {
+    email: string;
+    password: string;
+  }) => {
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
-    })
+    });
 
-    if (data?.user) {
-      user.value = data.user
+    if (data?.user && data.session?.access_token) {
+      accessToken.value = data.session.access_token;
+      user.value = data.user.user_metadata;
+      sessionStorage.setItem("token", data.session.access_token);
     }
 
-    return { data, error }
-  }
+    return { data, error };
+  };
 
   const register = async ({
     firstname,
@@ -25,54 +38,53 @@ export const useAuthStore = defineStore('auth', () => {
     email,
     password,
   }: {
-    firstname: string
-    lastname: string
-    email: string
-    password: string
+    firstname: string;
+    lastname: string;
+    email: string;
+    password: string;
   }) => {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
-    })
-  
-    if (data?.user) {
-      const { error: profileError } = await supabase.from('users').upsert([
-        {
-          id: data.user.id,
+      options: {
+        data: {
           firstname,
           lastname,
-          display_name: `${firstname} ${lastname}`,
         },
-      ])
-  
-      if (profileError) {
-        return { error: profileError }
-      }
-  
-      user.value = data.user
+      },
+    });
+
+    if (data?.user && data.session?.access_token) {
+      accessToken.value = data.session.access_token;
     }
-  
-    return { data, error }
-  }
-  
-  const getCurrentUser = async () => {
-    const { data: userData, error } = await supabase.auth.getUser()
-    if (userData) {
-      user.value = userData
+
+    return { data, error };
+  };
+  const getUser = async () => {
+    const { data, error } = await supabase.auth.getUser();
+    if (data?.user) {
+      user.value = {
+        firstname: data.user?.user_metadata?.firstname || "",
+        lastname: data.user?.user_metadata?.lastname || "",
+        email: data.user?.email,
+      };
     }
-    return { user: user.value, error }
-  }
+    // console.log('state',data.user?.user_metadata);
+    
+    return { user: user.value, error };
+  };
 
   const logout = async () => {
-    await supabase.auth.signOut()
-    user.value = null
-  }
+    await supabase.auth.signOut();
+    accessToken.value = null;
+    sessionStorage.removeItem("token");
+  };
 
   return {
     user,
+    getUser,
     login,
     register,
-    getCurrentUser,
     logout,
-  }
-})
+  };
+});
